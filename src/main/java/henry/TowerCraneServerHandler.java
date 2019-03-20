@@ -5,6 +5,7 @@ import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.apache.commons.lang3.RegExUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import sun.nio.cs.ext.GBK;
 
 import java.util.Date;
@@ -21,8 +22,6 @@ public class TowerCraneServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-
-        System.out.println(new Date());
 
         //转换类型
         ByteBuf byteBuf = (ByteBuf) msg;
@@ -53,12 +52,21 @@ public class TowerCraneServerHandler extends ChannelInboundHandlerAdapter {
             int waitCount = 0;
             while (byteBuf.readerIndex() >= byteBuf.writerIndex()) {
                 waitCount++;
+                if (waitCount == 1) {
+                    System.out.print(
+                            String.format(
+                                    "Time: %s, ",
+                                    DateFormatUtils.ISO_8601_EXTENDED_DATETIME_FORMAT.format(new Date())
+                            )
+                    );
+                }
                 if (waitCount > 3) {
                     dump = true;
+                    System.out.println();
                     System.out.println(ByteBufUtil.prettyHexDump(byteBuf, 0, byteBuf.writerIndex()));
                     return;
                 }
-                System.out.println("Waiting to read");
+                System.out.print("Waiting... ");
                 try {
                     Thread.sleep(1000L);
                 } catch (InterruptedException e) {
@@ -99,7 +107,8 @@ public class TowerCraneServerHandler extends ChannelInboundHandlerAdapter {
         }
         System.out.println(
                 String.format(
-                        "Serial: %04x, Version: %02x, Command: %02x, String: %s",
+                        "Time: %s, Serial: %04x, Version: %02x, Command: %02x, String: %s",
+                        DateFormatUtils.ISO_8601_EXTENDED_DATETIME_FORMAT.format(new Date()),
                         frameSerial,
                         frameProtocolVersion,
                         frameCommand,
