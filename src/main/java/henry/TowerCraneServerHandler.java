@@ -112,7 +112,7 @@ public class TowerCraneServerHandler extends ChannelInboundHandlerAdapter {
                         frameSerial,
                         frameProtocolVersion,
                         frameCommand,
-                        RegExUtils.replaceAll(frameDataString, "（\\n\\s*)", " ")
+                        RegExUtils.replaceAll(frameDataString, "(\\n\\s*)", " ")
                 )
         );
     }
