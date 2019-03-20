@@ -46,20 +46,20 @@ public class TowerCraneServer {
                         public void initChannel(SocketChannel ch) throws Exception {
                             ChannelPipeline p = ch.pipeline();
                             if (sslCtx != null) {
-                                p.addLast(
-                                        new LengthFieldBasedFrameDecoder(
-                                                ByteOrder.LITTLE_ENDIAN,
-                                                Integer.MAX_VALUE,
-                                                2,
-                                                2,
-                                                -2,
-                                                0,
-                                                true
-                                        )
-                                );
                                 p.addLast(sslCtx.newHandler(ch.alloc()));
                             }
                             //p.addLast(new LoggingHandler(LogLevel.INFO));
+                            p.addLast(
+                                    new LengthFieldBasedFrameDecoder(
+                                            ByteOrder.LITTLE_ENDIAN,
+                                            Integer.MAX_VALUE,
+                                            2,
+                                            2,
+                                            -2,
+                                            0,
+                                            true
+                                    )
+                            );
                             p.addLast(serverHandler);
                         }
                     });
