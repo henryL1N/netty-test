@@ -30,6 +30,7 @@ public class TowerCraneServerHandler extends ChannelInboundHandlerAdapter {
         System.out.println(String.format("Prefix: %x", framePrefix));
         if (0x5a55 != framePrefix) {
             System.out.println("Invalid frame");
+            return;
         }
 
         //帧长（从包括帧长本身到帧末）
@@ -48,6 +49,7 @@ public class TowerCraneServerHandler extends ChannelInboundHandlerAdapter {
         byte frameChecksum = byteBuf.readByte();
         if (checksum != frameChecksum) {
             System.out.println(String.format("Invalid checksum, got: %x, expect: %x", frameChecksum, checksum));
+            return;
         }
 
         //帧流水号
