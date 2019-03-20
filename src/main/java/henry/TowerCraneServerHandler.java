@@ -40,7 +40,7 @@ public class TowerCraneServerHandler extends ChannelInboundHandlerAdapter {
         //校验和
         byteBuf.readerIndex(0);
         byte checksum = 0;
-        for (int i = frameLength; i > 0; i--) {
+        for (int i = frameLength; i >= 0; i--) {
             byte b = byteBuf.readByte();
             System.out.print(String.format("%x ", b));
             checksum += b;
