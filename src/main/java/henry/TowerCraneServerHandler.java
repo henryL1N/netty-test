@@ -63,7 +63,7 @@ public class TowerCraneServerHandler extends ChannelInboundHandlerAdapter {
 
         //命令
         short frameCommand = byteBuf.readUnsignedByte();
-        System.out.println("Command: " + frameCommand);
+        System.out.println("Command: %02x" + frameCommand);
 
         //数据载荷
         int dataLength = frameLength - 7;
