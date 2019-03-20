@@ -27,7 +27,7 @@ public class TowerCraneServerHandler extends ChannelInboundHandlerAdapter {
 
         //帧头
         int framePrefix = byteBuf.readUnsignedShort();
-        System.out.println(String.format("Prefix: %x", framePrefix));
+        System.out.println(String.format("Prefix: %02x", framePrefix));
         if (0x5a55 != framePrefix) {
             System.out.println("Invalid frame");
             return;
@@ -42,13 +42,13 @@ public class TowerCraneServerHandler extends ChannelInboundHandlerAdapter {
         byte checksum = 0;
         for (int i = frameLength; i >= 0; i--) {
             byte b = byteBuf.readByte();
-            System.out.print(String.format("%x ", b));
+            System.out.print(String.format("%02x ", b));
             checksum += b;
         }
         System.out.println();
         byte frameChecksum = byteBuf.readByte();
         if (checksum != frameChecksum) {
-            System.out.println(String.format("Invalid checksum, got: %x, expect: %x", frameChecksum, checksum));
+            System.out.println(String.format("Invalid checksum, got: %02x, expect: %02x", frameChecksum, checksum));
             return;
         }
 
