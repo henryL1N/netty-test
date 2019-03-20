@@ -17,6 +17,8 @@ import static io.netty.channel.ChannelHandler.Sharable;
 @Sharable
 public class TowerCraneServerHandler extends ChannelInboundHandlerAdapter {
 
+    boolean dump = false;
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
 
@@ -26,9 +28,11 @@ public class TowerCraneServerHandler extends ChannelInboundHandlerAdapter {
         ByteBuf byteBuf = (ByteBuf) msg;
 
         //打印原始数据
-        StringBuilder stringBuilder = new StringBuilder();
-        ByteBufUtil.appendPrettyHexDump(stringBuilder, byteBuf);
-        System.out.println("Dump: " + stringBuilder.toString());
+        if (dump) {
+            StringBuilder stringBuilder = new StringBuilder();
+            ByteBufUtil.appendPrettyHexDump(stringBuilder, byteBuf);
+            System.out.println(stringBuilder.toString());
+        }
 
         //帧头
         int framePrefix = byteBuf.readUnsignedShort();
@@ -50,6 +54,8 @@ public class TowerCraneServerHandler extends ChannelInboundHandlerAdapter {
             while (byteBuf.readerIndex() >= byteBuf.writerIndex()) {
                 waitCount++;
                 if (waitCount > 3) {
+                    dump = true;
+                    System.out.println(ByteBufUtil.prettyHexDump(byteBuf, 0, byteBuf.writerIndex()));
                     return;
                 }
                 System.out.println("Waiting to read");
@@ -88,6 +94,9 @@ public class TowerCraneServerHandler extends ChannelInboundHandlerAdapter {
         byte[] frameData = new byte[dataLength];
         byteBuf.getBytes(byteBuf.readerIndex(), frameData, 0, dataLength);
         String frameDataString = new String(frameData, new GBK());
+        if (dump) {
+            dump = false;
+        }
         System.out.println(
                 String.format(
                         "Serial: %04x, Version: %02x, Command: %02x, String: %s",
