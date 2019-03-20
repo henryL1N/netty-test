@@ -16,39 +16,51 @@ public class TowerCraneServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
+
+        //转换类型
         ByteBuf byteBuf = (ByteBuf) msg;
 
+        //打印原始数据
         StringBuilder stringBuilder = new StringBuilder();
-
         ByteBufUtil.appendPrettyHexDump(stringBuilder, byteBuf);
-
         System.out.println("Dump: " + stringBuilder.toString());
 
+        //帧头
         int framePrefix = byteBuf.readUnsignedShort();
         System.out.println(String.format("Prefix: %x", framePrefix));
         if (0x5a55 != framePrefix) {
             System.out.println("Invalid frame");
         }
+
+        //帧长（从包括帧长本身到帧末）
         int frameLength = byteBuf.readUnsignedShortLE();
         System.out.println("Length: " + frameLength);
-        byteBuf.readerIndex(2);
-        long checksum = 0L;
-        while (frameLength > 1) {
-            checksum += byteBuf.readUnsignedByte();
-            frameLength--;
+
+        //校验和
+        byteBuf.readerIndex(0);
+        byte checksum = 0;
+        for (int i = frameLength; i > 0; i--) {
+            checksum += byteBuf.readByte();
         }
-        short checksumByte = (short) ((int) checksum & 0xFF);
-        short frameChecksum = byteBuf.readUnsignedByte();
-        if (checksumByte != frameChecksum) {
-            System.out.println("Invalid checksum, got: \"" + frameChecksum + "\", expect: \"" + checksumByte + "\"");
+        byte frameChecksum = byteBuf.readByte();
+        if (checksum != frameChecksum) {
+            System.out.println(String.format("Invalid checksum, got: %x, expect: %x", frameChecksum, checksum));
         }
+
+        //帧流水号
         byteBuf.readerIndex(4);
         int frameSerial = byteBuf.readUnsignedShortLE();
         System.out.println("Serial: " + frameSerial);
+
+        //协议版本
         short frameProtocolVersion = byteBuf.readUnsignedByte();
         System.out.println("Version: " + frameProtocolVersion);
+
+        //命令
         short frameCommand = byteBuf.readUnsignedByte();
         System.out.println("Command: " + frameCommand);
+
+        //数据载荷
         int dataLength = frameLength - 7;
         byte[] frameData = new byte[dataLength];
         byteBuf.getBytes(byteBuf.readerIndex(), frameData, 0, dataLength);
