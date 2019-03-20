@@ -5,9 +5,12 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import sun.nio.cs.ext.GBK;
 
+import static io.netty.channel.ChannelHandler.Sharable;
+
 /**
  * @author Lin Qinghua linqinghua@zhuoqin.cn
  */
+@Sharable
 public class TowerCraneServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
