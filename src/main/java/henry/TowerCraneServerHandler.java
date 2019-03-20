@@ -1,6 +1,7 @@
 package henry;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import sun.nio.cs.ext.GBK;
@@ -16,6 +17,13 @@ public class TowerCraneServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         ByteBuf byteBuf = (ByteBuf) msg;
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        ByteBufUtil.appendPrettyHexDump(stringBuilder, byteBuf);
+
+        System.out.println("Dump: " + stringBuilder.toString());
+
         int framePrefix = byteBuf.readUnsignedShort();
         System.out.println(String.format("Prefix: %x", framePrefix));
         if (0x5a55 != framePrefix) {
