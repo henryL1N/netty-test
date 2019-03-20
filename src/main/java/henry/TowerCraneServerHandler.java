@@ -41,6 +41,19 @@ public class TowerCraneServerHandler extends ChannelInboundHandlerAdapter {
         byteBuf.readerIndex(0);
         byte checksum = 0;
         for (int i = frameLength; i >= 0; i--) {
+            int waitCount = 0;
+            while (byteBuf.readerIndex() >= byteBuf.writerIndex()) {
+                waitCount++;
+                if (waitCount > 3) {
+                    return;
+                }
+                System.out.println("Waiting to read");
+                try {
+                    Thread.sleep(1000L);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
             byte b = byteBuf.readByte();
             System.out.print(String.format("%02x ", b));
             checksum += b;
