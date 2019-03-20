@@ -40,8 +40,11 @@ public class TowerCraneServerHandler extends ChannelInboundHandlerAdapter {
         byteBuf.readerIndex(0);
         byte checksum = 0;
         for (int i = frameLength; i > 0; i--) {
-            checksum += byteBuf.readByte();
+            byte b = byteBuf.readByte();
+            System.out.print(String.format("%x ", b));
+            checksum += b;
         }
+        System.out.println();
         byte frameChecksum = byteBuf.readByte();
         if (checksum != frameChecksum) {
             System.out.println(String.format("Invalid checksum, got: %x, expect: %x", frameChecksum, checksum));
