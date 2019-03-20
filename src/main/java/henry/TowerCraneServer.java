@@ -5,11 +5,14 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
+
+import java.nio.ByteOrder;
 
 /**
  * @author Lin Qinghua linqinghua@zhuoqin.cn
@@ -43,6 +46,17 @@ public class TowerCraneServer {
                         public void initChannel(SocketChannel ch) throws Exception {
                             ChannelPipeline p = ch.pipeline();
                             if (sslCtx != null) {
+                                p.addLast(
+                                        new LengthFieldBasedFrameDecoder(
+                                                ByteOrder.LITTLE_ENDIAN,
+                                                Integer.MAX_VALUE,
+                                                2,
+                                                2,
+                                                -2,
+                                                0,
+                                                true
+                                        )
+                                );
                                 p.addLast(sslCtx.newHandler(ch.alloc()));
                             }
                             //p.addLast(new LoggingHandler(LogLevel.INFO));
